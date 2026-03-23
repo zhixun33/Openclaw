@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦞 OpenClaw 完全指南</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --ink:    #1c1c1e;
+  --ink2:   #48484a;
+  --ink3:   #8e8e93;
+  --ink4:   #c7c7cc;
+  --bg:     #f9f9f7;
+  --paper:  #ffffff;
+  --line:   #e8e8e8;
+  --red:    #9b2335;
+  --red-bg: #fdf5f5;
+  --green:  #1d6a45;
+  --grn-bg: #f2faf6;
+  --amber:  #7c5c10;
+  --amb-bg: #fdf9f0;
+  --blue:   #1a3d6b;
+  --blu-bg: #f2f6fc;
+  --code:   #f3f2ee;
+  --term:   #161618;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--ink); font-family: 'Noto Sans SC', sans-serif; font-size: 16px; line-height: 1.85; -webkit-font-smoothing: antialiased; }
+
+/* ── NAV ── */
+.nav { background: var(--paper); border-bottom: 2px solid var(--ink); height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; top: 0; z-index: 200; }
+.nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; letter-spacing: 2px; color: var(--ink); text-decoration: none; }
+.nav-box { width: 34px; height: 34px; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 3px; }
+.nav-tabs { display: flex; gap: 0; }
+.nav-tab { padding: 0 20px; height: 60px; display: flex; align-items: center; font-size: 14px; font-weight: 500; color: var(--ink3); text-decoration: none; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; white-space: nowrap; }
+.nav-tab:hover { color: var(--ink); }
+.nav-tab.part1 { border-color: transparent; }
+.nav-tab.part1.on, .nav-tab.part1:hover { color: var(--ink); border-color: var(--red); }
+.nav-tab.part2.on, .nav-tab.part2:hover { color: var(--ink); border-color: var(--blue); }
+.bar { height: 2px; background: var(--line); position: fixed; top: 60px; left: 0; right: 0; z-index: 199; }
+.bar-fill { height: 100%; background: var(--red); width: 0; transition: width 0.1s; }
+
+/* ── PART DIVIDER ── */
+.part-banner { padding: 40px 40px 32px; max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 20px; }
+.part-num { font-family: 'Noto Serif SC', serif; font-size: 80px; font-weight: 900; line-height: 1; color: var(--line); letter-spacing: -4px; }
+.part-text h2 { font-family: 'Noto Serif SC', serif; font-size: 28px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.part-text p { font-size: 15px; color: var(--ink3); font-weight: 400; }
+.part-rule { width: 100%; height: 1px; background: var(--line); max-width: 1120px; margin: 0 auto; }
+.part1-accent .part-num { color: rgba(155,35,53,0.08); }
+.part2-accent .part-num { color: rgba(26,61,107,0.08); }
+
+/* ── HERO ── */
+.hero { background: var(--paper); border-bottom: 1px solid var(--line); padding: 72px 40px 64px; max-width: 1120px; margin: 0 auto; }
+.eyebrow { font-size: 11px; font-weight: 600; color: var(--ink3); letter-spacing: 3px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--ink4); display: block; }
+.hero h1 { font-family: 'Noto Serif SC', serif; font-size: clamp(44px, 6vw, 80px); font-weight: 900; line-height: 1.05; letter-spacing: -2px; color: var(--ink); margin-bottom: 24px; }
+.hero h1 .r { color: var(--red); }
+.hero-lead { font-size: 17px; color: var(--ink2); line-height: 1.8; max-width: 560px; margin-bottom: 36px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { padding: 5px 14px; border: 1px solid var(--line); font-size: 12px; color: var(--ink3); font-family: 'JetBrains Mono', monospace; background: var(--bg); }
+
+/* ── STATS ── */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-bottom: none; max-width: 1120px; margin: 0 auto; background: var(--paper); }
+.stat { padding: 28px 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stat:last-child { border-right: none; }
+.stat-tag { font-size: 10px; color: var(--ink4); letter-spacing: 2px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; font-weight: 600; }
+.stat-n { font-size: 38px; font-weight: 900; color: var(--ink); line-height: 1; letter-spacing: -2px; margin-bottom: 6px; font-family: 'Noto Serif SC', serif; }
+.stat-n span { color: var(--red); }
+.stat-desc { font-size: 13px; color: var(--ink3); }
+
+/* ── PAGE LAYOUT ── */
+.page { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 176px 1fr; }
+
+/* ── SIDEBAR ── */
+.aside { border-right: 1px solid var(--line); padding: 40px 20px 40px 0; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; scrollbar-width: none; background: var(--paper); }
+.aside::-webkit-scrollbar { display: none; }
+.aside-sep { font-size: 10px; color: var(--ink4); letter-spacing: 2px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; padding: 20px 0 10px 16px; font-weight: 600; display: block; }
+.aside-sep:first-child { padding-top: 0; }
+.asi { display: flex; align-items: center; gap: 8px; padding: 6px 0 6px 16px; text-decoration: none; color: var(--ink2); font-size: 13px; border-left: 2px solid transparent; margin-left: -1px; transition: all 0.15s; white-space: nowrap; font-weight: 400; }
+.asi:hover { color: var(--ink); }
+.asi.on { color: var(--red); border-left-color: var(--red); font-weight: 700; }
+.asi-n { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink4); min-width: 18px; flex-shrink: 0; }
+
+/* ── CONTENT ── */
+.content { padding: 0 0 80px 56px; }
+
+/* ── SECTION ── */
+.sec { padding: 56px 0; border-bottom: 1px solid var(--line); }
+.sec:last-child { border-bottom: none; }
+.sec-tag { font-size: 11px; color: var(--ink4); letter-spacing: 2.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; font-weight: 600; }
+.sec h2 { font-family: 'Noto Serif SC', serif; font-size: 32px; font-weight: 700; color: var(--ink); line-height: 1.2; margin-bottom: 8px; }
+.sec-sub { font-size: 15px; color: var(--ink2); margin-bottom: 28px; }
+.sec h3 { font-size: 20px; font-weight: 700; color: var(--ink); margin: 32px 0 12px; }
+
+/* ── CALLOUTS ── */
+.callout { padding: 18px 22px; margin: 16px 0; border-left: 3px solid; }
+.callout-tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+.callout p { font-size: 15px; line-height: 1.8; }
+.callout p strong { font-weight: 700; }
+.c-why { background: var(--blu-bg); border-color: #3b6fbf; }
+.c-why .callout-tag { color: var(--blue); }
+.c-why p { color: #2c4a7a; }
+.c-warn { background: var(--amb-bg); border-color: #c8922a; }
+.c-warn .callout-tag { color: var(--amber); }
+.c-warn p { color: #6b4e10; }
+.c-ok { background: var(--grn-bg); border-color: #2e9a65; }
+.c-ok .callout-tag { color: var(--green); }
+.c-ok p { color: #1a5535; }
+
+/* ── USECASE CARDS ── */
+.uc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 20px 0; }
+.uc { background: var(--paper); border: 1px solid var(--line); padding: 20px 22px; }
+.uc-icon { font-size: 24px; margin-bottom: 10px; display: block; }
+.uc-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.uc-desc { font-size: 14px; color: var(--ink2); line-height: 1.7; }
+.uc-tag { display: inline-block; margin-top: 10px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--ink4); background: var(--bg); padding: 2px 8px; }
+
+/* ── STAGE CARDS ── */
+.stage { border: 1px solid var(--line); margin: 20px 0; overflow: hidden; background: var(--paper); }
+.stage-head { padding: 16px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; }
+.stage-num { font-family: 'Noto Serif SC', serif; font-size: 36px; font-weight: 900; color: var(--line); line-height: 1; letter-spacing: -2px; }
+.stage-meta { flex: 1; }
+.stage-label { font-size: 10px; color: var(--ink4); letter-spacing: 2px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 3px; }
+.stage-title { font-size: 17px; font-weight: 700; color: var(--ink); }
+.stage-body { padding: 18px 22px; font-size: 14px; color: var(--ink2); line-height: 1.8; }
+.stage-body strong { color: var(--ink); }
+
+/* ── SKILL PILLS ── */
+.skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.skill-pill { padding: 6px 14px; border: 1px solid var(--line); font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--ink2); background: var(--bg); display: flex; align-items: center; gap: 6px; }
+.skill-pill .sp-cat { font-size: 10px; color: var(--ink4); }
+
+/* ── MODEL TABLE ── */
+.model-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+.model-card { background: var(--paper); border: 1px solid var(--line); padding: 20px; }
+.model-card.recommended { border-color: var(--green); background: var(--grn-bg); }
+.model-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.model-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--red); font-weight: 500; margin-bottom: 10px; }
+.model-tag { font-size: 10px; font-family: 'JetBrains Mono', monospace; background: var(--green); color: white; padding: 2px 8px; margin-bottom: 8px; display: inline-block; }
+.model-desc { font-size: 13px; color: var(--ink2); line-height: 1.7; }
+.model-best { font-size: 12px; color: var(--ink3); margin-top: 8px; }
+.model-best strong { color: var(--ink2); }
+
+/* ── TERMINAL ── */
+.term { border-radius: 4px; overflow: hidden; margin: 14px 0; border: 1px solid #ccc; }
+.term-bar { background: #2c2c2e; padding: 9px 14px; display: flex; align-items: center; gap: 5px; }
+.d { width: 11px; height: 11px; border-radius: 50%; }
+.dr{background:#ff5f57}.dy{background:#febc2e}.dg{background:#28c840}
+.tlbl { font-size: 12px; color: #666; font-family: 'JetBrains Mono', monospace; margin-left: 8px; flex: 1; }
+.cbtn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #777; padding: 3px 10px; font-size: 11px; cursor: pointer; font-family: 'Noto Sans SC', sans-serif; border-radius: 3px; transition: all 0.15s; }
+.cbtn:hover { color: #ccc; background: rgba(255,255,255,0.12); }
+.cbtn.ok { color: #4ade80; border-color: rgba(74,222,128,0.35); }
+.tbody { background: var(--term); padding: 18px 20px; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 2; color: #c8c8c8; }
+.tp{color:#5cc85c}.tc{color:#5a7a5a}.ts{color:#5cc85c}.te{color:#e07060}.tw{color:#c8b45a}
+
+/* ── PITFALL ── */
+.pit { border: 1px solid #f5c6c6; overflow: hidden; margin: 20px 0; }
+.pit-h { background: #fef7f7; padding: 14px 18px; border-bottom: 1px solid #f5c6c6; display: flex; gap: 10px; align-items: flex-start; }
+.pit-ico { font-size: 15px; margin-top: 1px; flex-shrink: 0; }
+.pit-t { font-size: 14px; font-weight: 700; color: #8b1a1a; line-height: 1.4; }
+.pit-s { font-size: 12px; color: #c0392b; margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+.pit-b { background: var(--paper); padding: 16px 18px; }
+.sol-t { font-size: 10px; font-weight: 700; color: var(--green); letter-spacing: 1.5px; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+.pit-b p { font-size: 15px; color: var(--ink2); line-height: 1.8; }
+.pit-b strong { color: var(--ink); font-weight: 600; }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+th { background: var(--ink); color: var(--paper); font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 11px 14px; text-align: left; font-family: 'JetBrains Mono', monospace; }
+td { padding: 11px 14px; border-bottom: 1px solid var(--line); color: var(--ink2); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+.qr td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--red); background: var(--red-bg); font-weight: 500; }
+.qr td:nth-child(3) { color: var(--green); font-weight: 600; }
+
+/* ── FILE BLOCK ── */
+.fb { border: 1px solid var(--line); overflow: hidden; margin: 14px 0; }
+.fb-h { background: var(--bg); border-bottom: 1px solid var(--line); padding: 9px 16px; display: flex; align-items: center; gap: 8px; }
+.fb-n { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); flex: 1; font-weight: 500; }
+.fb-b { background: var(--code); padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 2; color: var(--ink2); white-space: pre-wrap; }
+.fh{color:var(--red);font-weight:700}.fk{color:var(--blue)}.fc{color:var(--ink4)}
+
+/* ── STEPS ── */
+.steps { list-style: none; margin: 14px 0; }
+.steps li { display: flex; gap: 14px; margin-bottom: 14px; }
+.sn { flex-shrink: 0; width: 26px; height: 26px; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-top: 3px; }
+.sc { font-size: 15px; color: var(--ink2); line-height: 1.85; }
+.sc strong { color: var(--ink); font-weight: 700; }
+
+/* ── HIGHLIGHT ── */
+.hl { background: var(--ink); color: var(--paper); padding: 24px 28px; margin: 20px 0; }
+.hl-t { font-size: 10px; font-weight: 700; color: #c87070; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+.hl p { font-size: 15px; color: #b0b0b0; line-height: 2.1; }
+.hl strong { color: var(--paper); font-weight: 600; }
+
+/* ── FAQ ── */
+.faq { border: 1px solid var(--line); margin-bottom: 10px; background: var(--paper); overflow: hidden; }
+.faq-q { padding: 16px 20px; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.faq-q:hover { background: var(--bg); }
+.faq-arrow { font-size: 14px; color: var(--ink4); transition: transform 0.2s; }
+.faq.open .faq-arrow { transform: rotate(180deg); }
+.faq-a { display: none; padding: 0 20px 18px; font-size: 15px; color: var(--ink2); line-height: 1.8; border-top: 1px solid var(--line); padding-top: 16px; }
+.faq.open .faq-a { display: block; }
+
+/* ── INLINE CODE ── */
+code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--code); padding: 2px 7px; color: var(--ink2); font-weight: 500; }
+
+/* ── SECTION DIVIDER in content ── */
+.content-part { border-left: 3px solid var(--red); padding-left: 20px; margin: 40px 0 32px; }
+.content-part.blue { border-color: var(--blue); }
+.content-part-tag { font-size: 10px; color: var(--ink4); letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; font-weight: 700; margin-bottom: 4px; }
+.content-part h3 { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 700; color: var(--ink); }
+
+@media (max-width: 800px) {
+  .page { grid-template-columns: 1fr; }
+  .aside { display: none; }
+  .content { padding: 20px; }
+  .uc-grid { grid-template-columns: 1fr; }
+  .model-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .nav-tabs { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <a class="nav-logo" href="#"><div class="nav-box">🦞</div><span>OPENCLAW</span></a>
+  <div class="nav-tabs">
+    <a href="#part1" class="nav-tab part1">第一部分：为什么养龙虾</a>
+    <a href="#part2" class="nav-tab part2">第二部分：怎么部署龙虾</a>
+    <a href="#qref" class="nav-tab">速查表</a>
+  </div>
+</header>
+<div class="bar"><div class="bar-fill" id="pf"></div></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">开源 AI Agent · M1 Mac · 完全指南</div>
+  <h1>你的第一只<br><span class="r">AI 员工</span></h1>
+  <p class="hero-lead">OpenClaw 是目前全球增速最快的开源 AI Agent 框架，已获 247,000 GitHub Star。它运行在你自己的电脑上，帮你执行任务、自动化工作流、对接所有工具，数据完全本地，永久免费。</p>
+  <div class="chips">
+    <span class="chip">开源免费</span>
+    <span class="chip">数据本地</span>
+    <span class="chip">13,000+ Skills</span>
+    <span class="chip">飞书 / 钉钉 / Telegram</span>
+    <span class="chip">M1 Mac 优化</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-tag">GitHub Stars</div>
+    <div class="stat-n">247<span>K</span></div>
+    <div class="stat-desc">史上增速最快开源 AI 项目</div>
+  </div>
+  <div class="stat">
+    <div class="stat-tag">社区 Skills</div>
+    <div class="stat-n">13<span>K+</span></div>
+    <div class="stat-desc">ClawHub 上可用技能数量</div>
+  </div>
+  <div class="stat">
+    <div class="stat-tag">DeepSeek 日费用</div>
+    <div class="stat-n">¥1<span>~</span></div>
+    <div class="stat-desc">重度使用约 1 元/天</div>
+  </div>
+  <div class="stat">
+    <div class="stat-tag">部署时间</div>
+    <div class="stat-n">30<span>分</span></div>
+    <div class="stat-desc">从零到正常运行</div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="aside">
+    <span class="aside-sep">第一部分</span>
+    <a href="#p1s1" class="asi"><span class="asi-n">→</span>龙虾是什么</a>
+    <a href="#p1s2" class="asi"><span class="asi-n">→</span>能做什么</a>
+    <a href="#p1s3" class="asi"><span class="asi-n">→</span>四个进化阶段</a>
+    <a href="#p1s4" class="asi"><span class="asi-n">→</span>Skills 技能生态</a>
+    <a href="#p1s5" class="asi"><span class="asi-n">→</span>选哪个模型</a>
+    <a href="#p1s6" class="asi"><span class="asi-n">→</span>费用估算</a>
+    <a href="#p1s7" class="asi"><span class="asi-n">→</span>FAQ</a>
+    <span class="aside-sep">第二部分</span>
+    <a href="#p2s1" class="asi"><span class="asi-n">01</span>代理 + Homebrew</a>
+    <a href="#p2s2" class="asi"><span class="asi-n">02</span>Node.js 22</a>
+    <a href="#p2s3" class="asi"><span class="asi-n">03</span>安装 OpenClaw</a>
+    <a href="#p2s4" class="asi"><span class="asi-n">04</span>获取 API Key</a>
+    <a href="#p2s5" class="asi"><span class="asi-n">05</span>初始化向导</a>
+    <a href="#p2s6" class="asi"><span class="asi-n">06</span>配置文件</a>
+    <a href="#p2s7" class="asi"><span class="asi-n">07</span>启动验证</a>
+    <a href="#p2s8" class="asi"><span class="asi-n">08</span>接入飞书</a>
+    <a href="#p2s9" class="asi"><span class="asi-n">09</span>持续运行</a>
+    <a href="#p2s10" class="asi"><span class="asi-n">10</span>SOUL + USER</a>
+    <a href="#qref" class="asi"><span class="asi-n">—</span>速查表</a>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ════════ PART 1 ════════ -->
+    <div id="part1" style="padding-top:48px;padding-bottom:8px">
+      <div class="part-banner part1-accent" style="padding-left:0">
+        <div class="part-num">01</div>
+        <div class="part-text">
+          <h2>为什么养龙虾</h2>
+          <p>了解它能做什么，再决定要不要养</p>
+        </div>
+      </div>
+      <div class="part-rule"></div>
+    </div>
+
+    <!-- P1S1 龙虾是什么 -->
+    <section class="sec" id="p1s1">
+      <div class="sec-tag">What is OpenClaw</div>
+      <h2>龙虾是什么</h2>
+      <p class="sec-sub">一句话：运行在你电脑上的 AI 员工</p>
+
+      <div class="callout c-why">
+        <div class="callout-tag">💡 本质</div>
+        <p>ChatGPT 是云端的对话工具，它能帮你思考，但不能帮你行动。OpenClaw 是本地运行的 AI Agent，它不只是回答问题，而是<strong>真正执行任务</strong>——打开网页、读写文件、发送消息、操作飞书、定时触发工作流。你的数据完全在本地，不上传任何内容。</p>
+      </div>
+
+      <table style="margin-top:20px">
+        <tr><th>对比维度</th><th>ChatGPT / Claude</th><th>OpenClaw</th></tr>
+        <tr><td>运行位置</td><td>云端服务器</td><td>你自己的电脑</td></tr>
+        <tr><td>数据隐私</td><td>上传到云端</td><td>完全本地，不外传</td></tr>
+        <tr><td>行动能力</td><td>只能回答，不能执行</td><td>能执行：文件/网页/消息/定时任务</td></tr>
+        <tr><td>记忆能力</td><td>对话结束即忘</td><td>持久记忆，越用越了解你</td></tr>
+        <tr><td>接入渠道</td><td>只有网页/App</td><td>飞书、钉钉、Telegram、手机等</td></tr>
+        <tr><td>费用</td><td>月费 $20+</td><td>只付 API 调用费，约 ¥1/天</td></tr>
+      </table>
+    </section>
+
+    <!-- P1S2 能做什么 -->
+    <section class="sec" id="p1s2">
+      <div class="sec-tag">Use Cases</div>
+      <h2>能做什么</h2>
+      <p class="sec-sub">来自全球 100+ 用户的真实使用场景</p>
+
+      <div class="content-part">
+        <div class="content-part-tag">内容创作</div>
+        <h3>最广泛的使用场景</h3>
+      </div>
+
+      <div class="uc-grid">
+        <div class="uc">
+          <span class="uc-icon">✍️</span>
+          <div class="uc-title">社媒自动发布</div>
+          <div class="uc-desc">连接博客 RSS，自动生成平台适配内容发布到微博、X、LinkedIn。有用户每周节省 10+ 小时。</div>
+          <span class="uc-tag">内容创作</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">📰</span>
+          <div class="uc-title">Newsletter 撰写</div>
+          <div class="uc-desc">研究主题、起草内容、记住历史期刊避免重复，整个流程自动化。</div>
+          <span class="uc-tag">内容创作</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">▶️</span>
+          <div class="uc-title">YouTube 每日摘要</div>
+          <div class="uc-desc">定时抓取关注频道的新视频，转录并提取关键洞见，汇入笔记系统。</div>
+          <span class="uc-tag">信息管理</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">📊</span>
+          <div class="uc-title">SEO 文章生成</div>
+          <div class="uc-desc">多源研究 → 关键词结构 → 生成初稿，只需轻量校对即可发布。</div>
+          <span class="uc-tag">内容创作</span>
+        </div>
+      </div>
+
+      <div class="content-part" style="margin-top:36px">
+        <div class="content-part-tag">研究与情报</div>
+        <h3>高价值但需要更多设置</h3>
+      </div>
+
+      <div class="uc-grid">
+        <div class="uc">
+          <span class="uc-icon">🔍</span>
+          <div class="uc-title">竞品监控</div>
+          <div class="uc-desc">每周自动抓取竞品网站的定价、产品更新、新闻动态，格式化成结构化报告。</div>
+          <span class="uc-tag">商业情报</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">📈</span>
+          <div class="uc-title">财报追踪</div>
+          <div class="uc-desc">监控 SEC 文件和新闻，关键企业有重要公告时自动提醒，不错过任何财报季。</div>
+          <span class="uc-tag">商业情报</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">🛠️</span>
+          <div class="uc-title">需求挖掘 → MVP</div>
+          <div class="uc-desc">从 Reddit 和 X 上挖掘真实痛点，让龙虾直接构建解决问题的 MVP 原型。</div>
+          <span class="uc-tag">产品开发</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">📚</span>
+          <div class="uc-title">知识库搭建</div>
+          <div class="uc-desc">把 URL、推文、文章丢进对话框，龙虾自动建立带语义搜索的可查询知识库。</div>
+          <span class="uc-tag">知识管理</span>
+        </div>
+      </div>
+
+      <div class="content-part" style="margin-top:36px">
+        <div class="content-part-tag">个人效率</div>
+        <h3>即装即用，立竿见影</h3>
+      </div>
+
+      <div class="uc-grid">
+        <div class="uc">
+          <span class="uc-icon">☀️</span>
+          <div class="uc-title">每日早报</div>
+          <div class="uc-desc">早 8 点自动汇总邮件、日历、天气、行业新闻，发到飞书。多位用户称这一条就值部署的全部时间。</div>
+          <span class="uc-tag">个人效率</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">📝</span>
+          <div class="uc-title">会议纪要自动化</div>
+          <div class="uc-desc">转录会议录音 → 提取行动项 → 自动发给与会者 → 在 Jira/飞书创建任务并指派负责人。</div>
+          <span class="uc-tag">个人效率</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">📧</span>
+          <div class="uc-title">邮件管理</div>
+          <div class="uc-desc">自动分类、路由、起草回复。配合规则设置后基本不需要手动处理常规邮件。</div>
+          <span class="uc-tag">个人效率</span>
+        </div>
+        <div class="uc">
+          <span class="uc-icon">👨‍👩‍👧</span>
+          <div class="uc-title">家庭日历管理</div>
+          <div class="uc-desc">聚合全家日历、监控消息中的预约信息、管理家庭库存，早上统一播报。</div>
+          <span class="uc-tag">生活管理</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- P1S3 四个进化阶段 -->
+    <section class="sec" id="p1s3">
+      <div class="sec-tag">Evolution Path</div>
+      <h2>从新手到极客</h2>
+      <p class="sec-sub">四个阶段，按需进化，不用一步到位</p>
+
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-num">01</div>
+          <div class="stage-meta">
+            <div class="stage-label">新手期 · 第 1 周</div>
+            <div class="stage-title">日常助手：帮你做重复的事</div>
+          </div>
+        </div>
+        <div class="stage-body">
+          <strong>不需要任何技术背景。</strong> 配置好之后就像有了一个 7×24 的私人助理——帮你查信息、写内容、整理文档、定时提醒。飞书上发一条消息就能驱动。<br><br>
+          <strong>典型命令：</strong>「帮我总结这篇文章」「每天早上 8 点给我发今日安排」「把这个链接的内容整理成要点」
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-num">02</div>
+          <div class="stage-meta">
+            <div class="stage-label">进阶期 · 第 2～4 周</div>
+            <div class="stage-title">浏览器自动化：替你点击网页</div>
+          </div>
+        </div>
+        <div class="stage-body">
+          通过 CDP 协议控制浏览器，<strong>网页操作变成对话</strong>。不需要写代码，说出你想做什么，龙虾自己去点击、填写、抓取。<br><br>
+          <strong>典型场景：</strong>竞品定价监控、批量表单填写、社媒发布、电商数据采集、生成竞品对比报告
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-num">03</div>
+          <div class="stage-meta">
+            <div class="stage-label">高手期 · 第 1～2 月</div>
+            <div class="stage-title">工作流编排：多 Agent 协作</div>
+          </div>
+        </div>
+        <div class="stage-body">
+          多个龙虾实例分工协作：一个负责调研，一个负责写作，一个负责发布，并行推进。Hooks 机制实现事件驱动，代码提交自动跑测试，失败自动通知，<strong>零轮询零干预</strong>。<br><br>
+          <strong>典型场景：</strong>内容工厂流水线、GitHub CI/CD 自动化、监控 + 告警 + 修复一条龙
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-num">04</div>
+          <div class="stage-meta">
+            <div class="stage-label">极客期 · 长期</div>
+            <div class="stage-title">本地模型：完全离线，数据不出门</div>
+          </div>
+        </div>
+        <div class="stage-body">
+          用 Ollama 跑本地大模型，<strong>不依赖任何 API，零费用，完全离线</strong>。M1 Mac Mini 跑 7B 模型响应时间约 0.3～0.7 秒，功耗仅 20W，可支持 5～10 人并发使用。<br><br>
+          <strong>推荐模型：</strong><code>qwen2.5:7b-instruct</code>（工具调用最稳定）/ <code>llama3.1:8b</code>（英文场景）
+        </div>
+      </div>
+    </section>
+
+    <!-- P1S4 Skills -->
+    <section class="sec" id="p1s4">
+      <div class="sec-tag">Skills Ecosystem</div>
+      <h2>Skills 技能生态</h2>
+      <p class="sec-sub">ClawHub 上有 13,000+ 社区技能，但良莠不齐，这里是精选推荐</p>
+
+      <div class="callout c-warn">
+        <div class="callout-tag">⚠️ 安全提醒</div>
+        <p>2026 年初发生了 ClawHavoc 攻击事件，数百个恶意 Skill 被植入 ClawHub，使用仿冒名称诱导安装后门，导致 SSH Key、API Token、浏览器 Session 数据外泄。ClawHub 已联合 VirusTotal 扫描并下架 2,400+ 风险 Skill。<strong>安装前务必检查：发布者是否可信、GitHub 是否有维护记录、权限申请是否过度。</strong></p>
+      </div>
+
+      <h3>新手必装（安全、稳定、即用）</h3>
+      <div class="skills-wrap">
+        <div class="skill-pill">🌐 web-search <span class="sp-cat">搜索</span></div>
+        <div class="skill-pill">📄 nano-pdf <span class="sp-cat">PDF操作</span></div>
+        <div class="skill-pill">🌤️ weather <span class="sp-cat">天气</span></div>
+        <div class="skill-pill">🐙 github <span class="sp-cat">代码管理</span></div>
+        <div class="skill-pill">✍️ blog-writer <span class="sp-cat">内容创作</span></div>
+        <div class="skill-pill">📂 filesystem <span class="sp-cat">文件操作</span></div>
+      </div>
+
+      <h3>效率升级（进阶推荐）</h3>
+      <div class="skills-wrap">
+        <div class="skill-pill">📊 felo-slides <span class="sp-cat">PPT生成</span></div>
+        <div class="skill-pill">📱 telegram <span class="sp-cat">手机控制</span></div>
+        <div class="skill-pill">🔍 exa-web-search <span class="sp-cat">语义搜索</span></div>
+        <div class="skill-pill">📧 cold-email <span class="sp-cat">邮件外发</span></div>
+        <div class="skill-pill">🔧 seo-audit <span class="sp-cat">SEO检测</span></div>
+        <div class="skill-pill">🧠 memory-plus <span class="sp-cat">增强记忆</span></div>
+      </div>
+
+      <div class="term" style="margin-top:20px">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">安装 Skill</span><button class="cbtn" onclick="cp('sk',this)">复制</button></div>
+        <div class="tbody" id="sk"><span class="tc"># 安装单个 Skill</span>
+<span class="tp">~ %</span> npx clawhub@latest install web-search
+
+<span class="tc"># 查看已安装的 Skills</span>
+<span class="tp">~ %</span> npx clawhub@latest list
+
+<span class="tc"># 更新所有 Skills</span>
+<span class="tp">~ %</span> npx clawhub@latest update
+
+<span class="tc"># 或者在飞书/网页对话框里直接说：</span>
+<span class="tc"># "帮我安装 web-search 技能"</span></div>
+      </div>
+    </section>
+
+    <!-- P1S5 选哪个模型 -->
+    <section class="sec" id="p1s5">
+      <div class="sec-tag">Model Selection</div>
+      <h2>选哪个模型</h2>
+      <p class="sec-sub">不同场景用不同大脑，可以同时配多个</p>
+
+      <div class="model-grid">
+        <div class="model-card recommended">
+          <div class="model-tag">推荐新手首选</div>
+          <div class="model-name">DeepSeek V3</div>
+          <div class="model-price">¥0.28 / 百万 token 输入</div>
+          <div class="model-desc">价格极低，中文能力强，工具调用稳定。日常重度使用约 ¥1/天。注册即用，无需科学上网。</div>
+          <div class="model-best"><strong>最适合：</strong>日常对话、文档处理、内容创作</div>
+        </div>
+        <div class="model-card">
+          <div class="model-name">Qwen3 系列</div>
+          <div class="model-price">百炼平台，赠送额度可用</div>
+          <div class="model-desc">阿里云出品，中文理解一流，超长上下文（100万 token）。处理大型文档、长对话场景更有优势。</div>
+          <div class="model-best"><strong>最适合：</strong>长文档、中文理解、企业场景</div>
+        </div>
+        <div class="model-card">
+          <div class="model-name">本地 Ollama</div>
+          <div class="model-price">完全免费，零 API 费用</div>
+          <div class="model-desc">M1 16GB 跑 7B 量化模型，响应约 0.5～1 秒。数据完全离线，适合隐私敏感场景。</div>
+          <div class="model-best"><strong>最适合：</strong>隐私数据、离线使用、极客玩法</div>
+        </div>
+      </div>
+
+      <div class="callout c-ok" style="margin-top:8px">
+        <div class="callout-tag">✅ 多模型配置</div>
+        <p>在配置文件 providers 字段下同时填写多个模型，对话时直接说「用 DeepSeek 帮我...」或「用 Qwen 分析这个文档」，龙虾自动切换。</p>
+      </div>
+    </section>
+
+    <!-- P1S6 费用估算 -->
+    <section class="sec" id="p1s6">
+      <div class="sec-tag">Cost Estimation</div>
+      <h2>费用估算</h2>
+      <p class="sec-sub">OpenClaw 本身免费，只付大模型 API 调用费</p>
+
+      <table>
+        <tr><th>使用强度</th><th>日均对话</th><th>DeepSeek 日费用</th><th>月费用参考</th></tr>
+        <tr><td>轻度使用</td><td>10～20 条</td><td>¥0.1～0.3</td><td>约 ¥5～10</td></tr>
+        <tr><td>常规使用</td><td>50～100 条</td><td>¥0.5～1.5</td><td>约 ¥20～50</td></tr>
+        <tr><td>重度使用</td><td>200+ 条 + 自动化任务</td><td>¥2～5</td><td>约 ¥60～150</td></tr>
+        <tr><td>本地 Ollama</td><td>不限</td><td>¥0</td><td>¥0（电费忽略）</td></tr>
+      </table>
+
+      <div class="callout c-warn">
+        <div class="callout-tag">⚠️ Token 消耗提醒</div>
+        <p>龙虾每个任务会触发 5～10 次 API 调用，每次都会重发完整对话上下文。长会话积累大量历史后 token 消耗会快速上升。<strong>养成习惯：复杂任务结束后发 <code>/new</code> 开启新会话，避免上下文无限积累。</strong></p>
+      </div>
+    </section>
+
+    <!-- P1S7 FAQ -->
+    <section class="sec" id="p1s7">
+      <div class="sec-tag">FAQ</div>
+      <h2>常见问题</h2>
+      <p class="sec-sub">开始前最常被问到的问题</p>
+
+      <div class="faq" onclick="toggleFaq(this)">
+        <div class="faq-q">OpenClaw 和 Dify、Coze 有什么区别？<span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Dify 和 Coze 是云端 Agent 平台，你的数据和工作流在他们服务器上。OpenClaw 是本地运行，数据不离开你的电脑，可以直接访问本地文件和系统，且完全免费。代价是需要自己部署，但这份指南帮你解决了这个问题。</div>
+      </div>
+
+      <div class="faq" onclick="toggleFaq(this)">
+        <div class="faq-q">关掉电脑龙虾就停了吗？<span class="faq-arrow">▾</span></div>
+        <div class="faq-a">默认是的。但完成部署指南第 09 步「持续运行」后，龙虾会注册为系统 LaunchAgent，Mac 插电且屏幕关闭时依然在后台运行，飞书消息随时可以触达它。完全关机才会停。</div>
+      </div>
+
+      <div class="faq" onclick="toggleFaq(this)">
+        <div class="faq-q">数据安全吗？会不会被看到？<span class="faq-arrow">▾</span></div>
+        <div class="faq-a">OpenClaw 本身完全本地运行，不上传你的文件和对话内容。但你接入的 AI 大脑（DeepSeek、Qwen 等）是云端 API，你发给它的消息会传到对应厂商服务器。如果有隐私敏感数据，使用本地 Ollama 模型可以做到完全不出本机。</div>
+      </div>
+
+      <div class="faq" onclick="toggleFaq(this)">
+        <div class="faq-q">不懂代码能用好吗？<span class="faq-arrow">▾</span></div>
+        <div class="faq-a">部署需要跟着本指南在终端执行几十条命令，这本身不需要懂代码，只需要复制粘贴。部署完成后，日常使用完全通过自然语言在飞书对话，不需要任何编程知识。这份指南正是为不懂技术的用户写的，每步都有说明和成功示例。</div>
+      </div>
+
+      <div class="faq" onclick="toggleFaq(this)">
+        <div class="faq-q">同时用飞书和网页两个入口会冲突吗？<span class="faq-arrow">▾</span></div>
+        <div class="faq-a">同一个对话不会冲突，两边都能看到记录和互相同步。两个不同对话同时执行不同任务也没问题。唯一需要注意的是：两边同时操作同一个文件时可能产生冲突，执行重要任务时保持一个入口操作即可。</div>
+      </div>
+
+      <div class="faq" onclick="toggleFaq(this)">
+        <div class="faq-q">iPhone 上能用吗？<span class="faq-arrow">▾</span></div>
+        <div class="faq-a">间接可以。接入飞书后，手机飞书 App 就是控制龙虾的入口，随时随地发消息驱动它工作。2026.2.19 版本还支持了 Apple Watch，可以在手腕上收到龙虾主动推送的消息。</div>
+      </div>
+    </section>
+
+    <!-- ════════ PART 2 ════════ -->
+    <div id="part2" style="padding-top:16px;padding-bottom:8px;margin-top:40px">
+      <div class="part-banner part2-accent" style="padding-left:0">
+        <div class="part-num" style="color:rgba(26,61,107,0.08)">02</div>
+        <div class="part-text">
+          <h2 style="color:var(--blue)">怎么部署龙虾</h2>
+          <p>M1 Mac · 小白版 · 约 30 分钟完成</p>
+        </div>
+      </div>
+      <div class="part-rule"></div>
+    </div>
+
+    <!-- P2S1 -->
+    <section class="sec" id="p2s1">
+      <div class="sec-tag">Step 01</div>
+      <h2>代理 + Homebrew</h2>
+      <p class="sec-sub">地基，没有它后面装不了任何东西</p>
+
+      <div class="callout c-warn">
+        <div class="callout-tag">⚡ 每次打开终端先执行</div>
+        <p>国内直连 GitHub 经常超时。ClashX Pro 默认端口 7890，每次新开终端窗口先执行这两条，是所有步骤能跑通的前提。</p>
+      </div>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">设置代理 + 安装 Homebrew</span><button class="cbtn" onclick="cp('c1',this)">复制</button></div>
+        <div class="tbody" id="c1"><span class="tc"># 每次开终端先执行</span>
+<span class="tp">~ %</span> export https_proxy=http://127.0.0.1:7890
+<span class="tp">~ %</span> export http_proxy=http://127.0.0.1:7890
+
+<span class="tc"># 验证代理（看到 HTTP/2 200 就成功）</span>
+<span class="tp">~ %</span> curl -I https://github.com
+
+<span class="tc"># 安装 Homebrew（密码输入时不显示字符，盲打回车）</span>
+<span class="tp">~ %</span> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+<span class="tc"># M1 必须执行这两条</span>
+<span class="tp">~ %</span> echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+<span class="tp">~ %</span> eval "$(/opt/homebrew/bin/brew shellenv)"
+
+<span class="tp">~ %</span> brew --version
+<span class="ts">Homebrew 4.4.x  ← 看到版本号就成功</span></div>
+      </div>
+
+      <div class="pit">
+        <div class="pit-h"><div class="pit-ico">🚨</div><div><div class="pit-t">curl: (56) Recv failure: Operation timed out</div><div class="pit-s">GitHub 连接超时，安装脚本下载失败</div></div></div>
+        <div class="pit-b"><div class="sol-t">✅ 解决方案</div><p>确认终端代理已开启（执行上面两条 export 命令），然后重新运行安装命令。</p></div>
+      </div>
+    </section>
+
+    <!-- P2S2 -->
+    <section class="sec" id="p2s2">
+      <div class="sec-tag">Step 02</div>
+      <h2>Node.js 22</h2>
+      <p class="sec-sub">龙虾的运行引擎，版本必须 ≥ 22</p>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">安装并配置 Node.js 22</span><button class="cbtn" onclick="cp('c2',this)">复制</button></div>
+        <div class="tbody" id="c2"><span class="tp">~ %</span> brew install node@22
+<span class="tp">~ %</span> echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' >> ~/.zshrc
+<span class="tp">~ %</span> source ~/.zshrc
+
+<span class="tp">~ %</span> node -v
+<span class="ts">v22.14.0  ← 必须是 v22.x.x</span></div>
+      </div>
+    </section>
+
+    <!-- P2S3 -->
+    <section class="sec" id="p2s3">
+      <div class="sec-tag">Step 03</div>
+      <h2>安装 OpenClaw</h2>
+      <p class="sec-sub">1～5 分钟，见到 🦞 就成功</p>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">安装</span><button class="cbtn" onclick="cp('c3',this)">复制</button></div>
+        <div class="tbody" id="c3"><span class="tp">~ %</span> npm install -g openclaw@latest
+<span class="tw">npm warn deprecated...  ← warn 正常，不影响使用</span>
+<span class="ts">added 541 packages in 1m</span>
+<span class="ts">🦞 OpenClaw installed successfully!</span>
+
+<span class="tp">~ %</span> openclaw --version
+<span class="ts">openclaw/2026.3.13 darwin-arm64 node-v22.x.x</span></div>
+      </div>
+
+      <div class="pit">
+        <div class="pit-h"><div class="pit-ico">🚨</div><div><div class="pit-t">openclaw: command not found</div></div></div>
+        <div class="pit-b"><div class="sol-t">✅ 解决方案</div><p>执行 <code>source ~/.zshrc</code> 再试。</p></div>
+      </div>
+    </section>
+
+    <!-- P2S4 -->
+    <section class="sec" id="p2s4">
+      <div class="sec-tag">Step 04</div>
+      <h2>获取 API Key</h2>
+      <p class="sec-sub">推荐 DeepSeek，注册即用，无需特殊网络</p>
+
+      <div class="callout c-warn">
+        <div class="callout-tag">⚠️ 安全提醒</div>
+        <p>Key 只在创建时显示一次，立刻存到备忘录。<strong>不要把 Key 粘贴在任何 AI 对话里。</strong> 暴露了立刻去平台删掉重建。</p>
+      </div>
+
+      <ul class="steps">
+        <li><div class="sn">1</div><div class="sc">浏览器打开 <strong>https://platform.deepseek.com</strong>，手机号注册</div></li>
+        <li><div class="sn">2</div><div class="sc">登录后点左侧 <strong>「API Keys」→「+ 创建 API Key」</strong></div></li>
+        <li><div class="sn">3</div><div class="sc">复制 <code>sk-</code> 开头的 Key，存到备忘录</div></li>
+      </ul>
+
+      <div class="pit">
+        <div class="pit-h"><div class="pit-ico">🚨</div><div><div class="pit-t">百炼 Coding Plan Key 一直报 401</div><div class="pit-s">HTTP 401: invalid access token or token expired</div></div></div>
+        <div class="pit-b"><div class="sol-t">✅ 原因 + 解法</div><p><code>sk-sp-</code> 开头的 Coding Plan Key 只支持代码补全，不支持对话。加上 OAuth 失败会留下残留配置。最简单：直接换 DeepSeek Key。</p></div>
+      </div>
+
+      <div class="pit">
+        <div class="pit-h"><div class="pit-ico">🚨</div><div><div class="pit-t">Qwen OAuth 显示「账号未注册」</div></div></div>
+        <div class="pit-b"><div class="sol-t">✅ 解法</div><p>阿里云账号和 chat.qwen.ai 是两套体系。<strong>Ctrl+C 退出向导</strong>，重新运行 <code>openclaw onboard</code>，选 Other/Custom，手动填写 baseUrl 和 Key。</p></div>
+      </div>
+    </section>
+
+    <!-- P2S5 -->
+    <section class="sec" id="p2s5">
+      <div class="sec-tag">Step 05</div>
+      <h2>初始化向导</h2>
+      <p class="sec-sub">只做一次。方向键选择，回车确认</p>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">运行向导</span></div>
+        <div class="tbody"><span class="tp">~ %</span> openclaw onboard</div>
+      </div>
+
+      <table>
+        <tr><th>向导问题</th><th>选择</th><th>说明</th></tr>
+        <tr><td>风险确认</td><td>Yes</td><td>确认个人使用</td></tr>
+        <tr><td>启动模式</td><td>QuickStart</td><td>新手选这个</td></tr>
+        <tr><td>AI 模型</td><td>DeepSeek</td><td>或选 Other 手动填</td></tr>
+        <tr><td>API Key 方式</td><td>Paste API key now</td><td>直接粘贴，不选 external</td></tr>
+        <tr><td>搜索 / Hooks / Skills / 渠道</td><td>全部 Skip for now</td><td>先跑通再配</td></tr>
+        <tr><td>最后启动</td><td>open in web ui</td><td>浏览器自动打开控制台</td></tr>
+      </table>
+    </section>
+
+    <!-- P2S6 -->
+    <section class="sec" id="p2s6">
+      <div class="sec-tag">Step 06</div>
+      <h2>配置文件</h2>
+      <p class="sec-sub">直接改 JSON，比在界面操作更可靠，所见即所得</p>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">打开配置文件</span><button class="cbtn" onclick="cp('c4',this)">复制</button></div>
+        <div class="tbody" id="c4"><span class="tp">~ %</span> open ~/.openclaw/openclaw.json</div>
+      </div>
+
+      <p style="font-size:15px;color:var(--ink2);margin:14px 0 10px"><strong>Command+A 全选 → Delete 删除</strong>，粘贴以下内容，替换两处红色位置：</p>
+
+      <div class="fb">
+        <div class="fb-h"><span>📄</span><span class="fb-n">openclaw.json — 完整配置（全选替换）</span><button class="cbtn" style="background:var(--bg);border:1px solid var(--line);color:var(--ink3)" onclick="cp('cfg',this)">复制</button></div>
+        <div class="fb-b" id="cfg"><span class="fh">{</span>
+  <span class="fk">"models"</span>: {
+    <span class="fk">"mode"</span>: "replace",  <span class="fc">← 只显示你配的模型，隐藏内置几十个</span>
+    <span class="fk">"providers"</span>: {
+      <span class="fk">"deepseek"</span>: {
+        <span class="fk">"baseUrl"</span>: "https://api.deepseek.com/v1",
+        <span class="fk">"apiKey"</span>: <span style="color:var(--red)">"这里换成你的 DeepSeek Key"</span>,
+        <span class="fk">"api"</span>: "openai-completions",
+        <span class="fk">"models"</span>: [{ "id": "deepseek-chat", "name": "DeepSeek V3",
+          "input": ["text"], "contextWindow": 65536, "maxTokens": 8192 }]
+      }
+    }
+  },
+  <span class="fk">"agents"</span>: {
+    <span class="fk">"defaults"</span>: {
+      <span class="fk">"model"</span>: { "primary": "deepseek/deepseek-chat" },
+      <span class="fk">"workspace"</span>: <span style="color:var(--red)">"/Users/你的Mac用户名/.openclaw/workspace"</span>
+    }
+  },
+  <span class="fk">"tools"</span>: { "profile": "coding" },
+  <span class="fk">"gateway"</span>: {
+    "port": 18789, "mode": "local", "bind": "loopback",
+    <span class="fk">"auth"</span>: { "mode": "token", "token": <span style="color:var(--red)">"从原文件复制你的 token，不要改"</span> }
+  }
+<span class="fh">}</span></div>
+      </div>
+    </section>
+
+    <!-- P2S7 -->
+    <section class="sec" id="p2s7">
+      <div class="sec-tag">Step 07</div>
+      <h2>启动验证</h2>
+      <p class="sec-sub">看到「无法访问此网站」就执行这两条，记住它</p>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">固定启动命令</span><button class="cbtn" onclick="cp('c5',this)">复制</button></div>
+        <div class="tbody" id="c5"><span class="tp">~ %</span> openclaw gateway install
+<span class="tp">~ %</span> openclaw gateway start
+<span class="tp">~ %</span> openclaw gateway status
+<span class="ts">● openclaw-gateway  RUNNING  ← 看到这个就正常</span></div>
+      </div>
+
+      <div class="hl">
+        <div class="hl-t">🎯 验证成功的标志</div>
+        <p>浏览器访问 <strong>http://127.0.0.1:18789</strong>，看到 OpenClaw 界面，发一条「你好」能收到回复，部署完成。</p>
+      </div>
+    </section>
+
+    <!-- P2S8 -->
+    <section class="sec" id="p2s8">
+      <div class="sec-tag">Step 08</div>
+      <h2>接入飞书</h2>
+      <p class="sec-sub">不需要公网 IP，本地直连飞书云端，手机随时遥控</p>
+
+      <p style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px">第一部分：飞书开放平台建机器人</p>
+      <ul class="steps">
+        <li><div class="sn">1</div><div class="sc">打开 <strong>https://open.feishu.cn</strong> → 开发者后台 → 创建企业自建应用</div></li>
+        <li><div class="sn">2</div><div class="sc">左侧「凭证与基础信息」，复制 <strong>App ID</strong> 和 <strong>App Secret</strong></div></li>
+        <li><div class="sn">3</div><div class="sc">左侧「添加应用能力」→「机器人」，开启</div></li>
+        <li><div class="sn">4</div><div class="sc">左侧「事件与回调」→ 选 <strong>「使用长连接接收事件」</strong>（不需要公网的关键）</div></li>
+        <li><div class="sn">5</div><div class="sc">左侧「版本管理与发布」→ 创建版本 → 申请发布</div></li>
+      </ul>
+
+      <div class="term" style="margin-top:16px">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">OpenClaw 配置飞书</span><button class="cbtn" onclick="cp('c6',this)">复制</button></div>
+        <div class="tbody" id="c6"><span class="tp">~ %</span> openclaw channels add
+<span class="tc"># 选 Feishu，填入 App ID 和 App Secret</span>
+<span class="tp">~ %</span> openclaw gateway restart
+<span class="tp">~ %</span> openclaw logs --follow
+<span class="ts">feishu ws connected  ← 看到这行，飞书接通</span></div>
+      </div>
+
+      <div class="callout c-ok" style="margin-top:14px">
+        <div class="callout-tag">✅ 接入后自动解锁</div>
+        <p>读写飞书文档 / 操作表格 / 访问知识库 / 云盘文件 / 日历 / 任务管理 — 全部通过自然语言驱动</p>
+      </div>
+    </section>
+
+    <!-- P2S9 -->
+    <section class="sec" id="p2s9">
+      <div class="sec-tag">Step 09</div>
+      <h2>持续运行</h2>
+      <p class="sec-sub">开机自启 + 插电不睡眠，7×24 在线</p>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">注册系统服务 + 防睡眠</span><button class="cbtn" onclick="cp('c7',this)">复制</button></div>
+        <div class="tbody" id="c7"><span class="tc"># 注册为开机自启服务</span>
+<span class="tp">~ %</span> openclaw gateway install --force
+<span class="ts">Installed LaunchAgent: ~/Library/LaunchAgents/ai.openclaw.gateway.plist</span>
+
+<span class="tc"># 插电时永不睡眠（拔电后自动恢复省电）</span>
+<span class="tp">~ %</span> sudo pmset -c sleep 0</div>
+      </div>
+
+      <table style="margin-top:14px">
+        <tr><th>系统设置位置</th><th>项目</th><th>推荐</th></tr>
+        <tr><td>设置 → 电池 → 选项</td><td>插电时显示器关闭，防止自动进入睡眠</td><td>✅ 打开</td></tr>
+        <tr><td>设置 → 电池 → 选项</td><td>唤醒以供网络访问</td><td>始终</td></tr>
+      </table>
+    </section>
+
+    <!-- P2S10 -->
+    <section class="sec" id="p2s10">
+      <div class="sec-tag">Step 10</div>
+      <h2>SOUL + USER</h2>
+      <p class="sec-sub">让龙虾认识你，从失忆状态变成专属助手</p>
+
+      <div class="callout c-why">
+        <div class="callout-tag">💡 设计原则</div>
+        <p><strong>不写身份标签</strong>（「我是 XX 专家」会限制联想），只写思维方法论。USER.md 放不变的生活事实，SOUL.md 放行为操作系统。两个文件控制在 300 字以内，越精简越不傻。</p>
+      </div>
+
+      <div class="term">
+        <div class="term-bar"><div class="d dr"></div><div class="d dy"></div><div class="d dg"></div><span class="tlbl">打开文件</span><button class="cbtn" onclick="cp('c8',this)">复制</button></div>
+        <div class="tbody" id="c8"><span class="tp">~ %</span> open ~/.openclaw/workspace/USER.md
+<span class="tp">~ %</span> mkdir -p ~/.openclaw/agents/default && open ~/.openclaw/agents/default/SOUL.md</div>
+      </div>
+
+      <p style="font-size:13px;color:var(--ink3);margin:20px 0 6px;font-family:'JetBrains Mono',monospace">USER.md 参考模板</p>
+      <div class="fb">
+        <div class="fb-h"><span>👤</span><span class="fb-n">USER.md — 只写不变的事实</span></div>
+        <div class="fb-b"><span class="fh"># 你的名字</span>
+
+<span class="fh">## 生活锚点</span>
+<span class="fc"># 工作节律、作息偏好等</span>
+工作节律：（例）上下午高精力。
+
+<span class="fh">## 活跃项目</span>
+<span class="fc"># 当前 1～3 个重点项目，一句话描述</span>
+项目名：一句话描述。
+
+<span class="fh">## 关注方向</span>
+<span class="fc"># 用 / 分隔，3～6 个方向</span>
+方向 A / 方向 B / 方向 C</div>
+      </div>
+
+      <p style="font-size:13px;color:var(--ink3);margin:20px 0 6px;font-family:'JetBrains Mono',monospace">SOUL.md 通用版（可直接使用）</p>
+      <div class="fb">
+        <div class="fb-h"><span>🧠</span><span class="fb-n">SOUL.md — 思维操作系统 v1.0</span></div>
+        <div class="fb-b"><span class="fh"># 思维操作系统 v1.0</span>
+
+<span class="fh">## 处理逻辑</span>
+先找本质机制，再给方案，不跳过这一步。
+指令模糊时主动预判补全，不反复追问。
+复杂决策内审：风险 / 可行性 / 价值，完成后再输出。
+
+<span class="fh">## 输出格式</span>
+结论前置：一句话结论 → 关键拆解 → 可执行建议。
+高密度，表格和分层标题，禁止铺垫废话。
+
+<span class="fh">## 模式切换</span>
+决策/策略 → 框架+分析+建议 | 创意/产品 → 发散多点
+复杂理解 → 逐步引导 | 选择题 → 方案对比+推荐
+
+<span class="fh">## 主动触发</span>
+发现更优路径 → 直接说 | 深陷细节超3轮 → 跳出提醒全局
+发现风险 → 主动标出 | 回答后 → 补一个更高维视角
+
+<span class="fh">## 进化协议</span>
+发现更高效路径，直接提出升级此系统。
+
+<span class="fh">## 禁止</span>
+通用答案 / 重复已知背景 / 寒暄废话 / 机械列点
+
+<span class="fc">---</span>
+<span class="fc"># 以下可按个人需要追加（语言偏好、领域规则等）</span></div>
+      </div>
+    </section>
+
+    <!-- QUICK REF -->
+    <section class="sec" id="qref">
+      <div class="sec-tag">Quick Reference</div>
+      <h2>速查表</h2>
+      <p class="sec-sub">遇到问题直接查这里</p>
+
+      <table class="qr">
+        <tr><th>报错 / 现象</th><th>原因</th><th>解决</th></tr>
+        <tr><td>curl: (56) timed out</td><td>GitHub 超时</td><td>export https_proxy=http://127.0.0.1:7890</td></tr>
+        <tr><td>no such file: /opt/homebrew</td><td>M1 路径未配</td><td>eval "$(/opt/homebrew/bin/brew shellenv)"</td></tr>
+        <tr><td>openclaw: command not found</td><td>路径未生效</td><td>source ~/.zshrc</td></tr>
+        <tr><td>HTTP 401: invalid access token</td><td>OAuth残留 / Key不匹配</td><td>换 DeepSeek Key，删 auth 段</td></tr>
+        <tr><td>HTTP 401: Incorrect API key</td><td>Coding Plan Key不支持对话</td><td>换普通Key或用DeepSeek</td></tr>
+        <tr><td>无法访问此网站</td><td>Gateway没跑起来</td><td>openclaw gateway install && start</td></tr>
+        <tr><td>Unrecognized key: model</td><td>字段名写错</td><td>是 models（复数）</td></tr>
+        <tr><td>下拉菜单几十个模型</td><td>mode 用了 merge</td><td>"mode": "replace"</td></tr>
+        <tr><td>关闭终端龙虾就停</td><td>未注册系统服务</td><td>openclaw gateway install --force</td></tr>
+        <tr><td>飞书发消息没反应</td><td>长连接断开</td><td>openclaw logs --follow，重启 gateway</td></tr>
+        <tr><td>token 烧得很快</td><td>上下文积累过长</td><td>发 /new 开启新会话</td></tr>
+      </table>
+
+      <div class="hl" style="margin-top:24px">
+        <div class="hl-t">📌 日常只需要记这些</div>
+        <p>
+          <strong>访问控制台</strong> → http://127.0.0.1:18789<br>
+          <strong>遇到无法访问</strong> → openclaw gateway install &amp;&amp; openclaw gateway start<br>
+          <strong>改配置后生效</strong> → 网页 Save → Apply → Update<br>
+          <strong>开机自动启动</strong> → 已注册 LaunchAgent，无需手动<br>
+          <strong>Key 暴露了</strong> → 立刻去对应平台删掉重建<br>
+          <strong>会话太长</strong> → 发 /new 重置上下文
+        </p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+function cp(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const text = el.innerText.replace(/←.+/g,'').replace(/\s+\n/g,'\n').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ 已复制'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function toggleFaq(el) { el.classList.toggle('open'); }
+
+const secs = document.querySelectorAll('.sec[id], [id="part1"], [id="part2"]');
+const asides = document.querySelectorAll('.asi');
+const pf = document.getElementById('pf');
+
+window.addEventListener('scroll', () => {
+  const st = window.scrollY;
+  const dh = document.documentElement.scrollHeight - window.innerHeight;
+  pf.style.width = Math.min(100, st / dh * 100) + '%';
+  let cur = '';
+  secs.forEach(s => { if (st >= s.offsetTop - 120) cur = s.id; });
+  asides.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur));
+}, { passive: true });
+</script>
+</body>
+</html>
